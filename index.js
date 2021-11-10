@@ -31,6 +31,13 @@ async function run(){
         })
 
 
+        app.get("/OrderedProduct/:email", async(req, res)=>{
+            const email = req.params.email;
+            const data = orderedData.find({email: email});
+            const allOrders = await data.toArray();
+            res.send(allOrders);
+          })
+
         app.post("/OrderedProduct", async(req, res) =>{
             const data = req.body;
             data.status = 0
