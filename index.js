@@ -46,7 +46,14 @@ async function run(){
 
 
        // order database server--------------- 
-       // order get method------------------
+       // simple get method to load all ordered products-------
+       app.get("/OrderedProduct", async(req, res) =>{
+           const product = orderedData.find({});
+           const result = await product.toArray();
+           res.send(result);
+       })
+
+       // order get method with email------------------
         app.get("/OrderedProduct/:email", async(req, res)=>{
             const email = req.params.email;
             const data = orderedData.find({email: email});
@@ -60,6 +67,22 @@ async function run(){
             data.status = 0
             const result = await orderedData.insertOne(data);
             res.json(result)
+        })
+
+        //update status-------------------
+        app.put("/OrderedProduct/:id", async(req, res)=>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const updateDoc = {
+                $set: {
+                    status: 1
+                },
+            }
+            const options = { upsert: true };
+            const result = await orderedData.updateOne(filter, updateDoc, options );
+            res.send(result)
+            console.log(result)
+
         })
 
         //delete my orders method--------------------
