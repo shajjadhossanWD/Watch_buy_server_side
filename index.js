@@ -23,26 +23,111 @@ async function run(){
         const database2 = client.db('all_order');
         const orderedData = database2.collection('orderData');
 
+        const database3 = client.db('all_reviews');
+        const reviewData = database3.collection('reviews');
+
+        const database4 = client.db('all_users');
+        const usersData = database4.collection('users');
+        
+        //product database server-------------------
+        //product get method ---------------------
         app.get("/watches", async(req, res)=>{
             const cursor = watchData.find({});
             const result = await cursor.toArray();
             res.send(result);
-            console.log(result)
+        })
+
+        // product post method ---------------------
+        app.post("/watches", async(req, res) =>{
+            const data = req.body;
+            const result = await watchData.insertOne(data);
+            res.json(result)
         })
 
 
+       // order database server--------------- 
+       // order get method------------------
         app.get("/OrderedProduct/:email", async(req, res)=>{
             const email = req.params.email;
             const data = orderedData.find({email: email});
             const allOrders = await data.toArray();
             res.send(allOrders);
           })
-
+        
+       // orders post method-------------------------
         app.post("/OrderedProduct", async(req, res) =>{
             const data = req.body;
             data.status = 0
             const result = await orderedData.insertOne(data);
             res.json(result)
+        })
+
+        //delete my orders method--------------------
+        app.delete("/OrderedProduct/:id", async(req, res)=>{
+            const id = req.params.id;
+            const getItem = {_id: ObjectId(id)}
+            const deleteItem = await orderedData.deleteOne(getItem)
+            res.json(deleteItem)
+        })
+
+
+    //    reviews section database server ---------
+    //    reviews get method-------------------
+        app.get("/review", async(req, res)=>{
+            const cursor = reviewData.find({});
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+    //    reviews post method--------------
+        app.post("/review", async(req, res) =>{
+            const data = req.body;
+            const result = await reviewData.insertOne(data);
+            res.json(result)
+        })
+        
+
+
+        // users database server------------------
+        //user get method------------------------
+        app.get('/users/:email', async(req, res)=>{
+            const email = req.params.email;
+            const query = { email : email };
+            const user = await usersData.findOne(query);
+            let isAdmin = false ;
+            if(user?.role === 'admin'){
+                isAdmin = true;
+            }
+            res.send({admin : isAdmin});
+        })
+
+        // user post method --------------------
+        app.post("/users", async(req, res)=>{
+            const user = req.body
+            const result= await usersData.insertOne(user);
+            res.json(result);
+        })
+
+        //user put method--------------------------
+        // app.put("/users", async(req, res)=>{
+        //     const user = req.body;
+        //     console.log('put', user)
+        //     const filter = {email: user.email};
+        //     const options = {upsert: true};
+        //     const updateDoc = {$set: user};
+        //     const result = await usersData.updateOne(filter, options, updateDoc);
+        //     res.json(result);
+        //     console.log(result)
+            
+        // })
+
+
+        app.put("/users/admin", async(req, res)=>{
+            const user = req.body;
+            const filter = { email: user.email};
+            const updateDoc = {$set: {role: 'admin'}};
+            const result = await usersData.updateOne(filter, updateDoc);
+            res.send(result);
         })
 
 
