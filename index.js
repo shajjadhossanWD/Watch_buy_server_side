@@ -47,10 +47,10 @@ async function run(){
 
         //product delete method-------------
         app.delete("/watches/:id", async(req, res)=>{
-            const product = req.query.id;
-            const filter = {_id: ObjectId(product)};
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
             const result = await watchData.deleteOne(filter);
-            res.send(result)
+            res.json(result)
         })
 
 
