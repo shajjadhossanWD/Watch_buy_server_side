@@ -45,6 +45,15 @@ async function run(){
         })
 
 
+        //product delete method-------------
+        app.delete("/watches/:id", async(req, res)=>{
+            const product = req.query.id;
+            const filter = {_id: ObjectId(product)};
+            const result = await watchData.deleteOne(filter);
+            res.send(result)
+        })
+
+
        // order database server--------------- 
        // simple get method to load all ordered products-------
        app.get("/OrderedProduct", async(req, res) =>{
